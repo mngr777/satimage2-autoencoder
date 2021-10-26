@@ -8,12 +8,11 @@ from tensorflow.keras.layers import Dense, Input
 from tensorflow.keras.models import Sequential, Model
 from tensorflow.keras.optimizers import Adam
 
-BottleneckSize = 16
-
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('data_file', help='Data file path')
     parser.add_argument('model_file', help='Trained autoencoder model file path')
+    parser.add_argument('--bottleneck', type=int, default=16, help='Encoder output size (integer)')
     return parser.parse_args()
 
 def main():
@@ -29,9 +28,12 @@ def main():
 
     # Create model
     autoenc = Sequential()
-    autoenc.add(Dense(BottleneckSize, activation='linear', name='encoder'))
+    autoenc.add(Dense(args.bottleneck, activation='linear', name='encoder', input_shape=(36,)))
     autoenc.add(Dense(36, activation='linear', name='decoder'))
     autoenc.compile(loss='mean_squared_error', optimizer=Adam())
+
+    # Print model summary
+    print(autoenc.summary())
 
     # Train
     history = History()
